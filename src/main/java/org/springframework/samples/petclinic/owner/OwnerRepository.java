@@ -60,5 +60,17 @@ public interface OwnerRepository extends Repository<Owner, Integer> {
 	 * @param owner the {@link Owner} to save
 	 */
 	void save(Owner owner);
-
+	public Collection<Owner> findByLastName(String lastName) {
+		// Unsafe injection	
+		//String sqlQuery = "SELECT DISTINCT owner FROM Owner owner left join fetch owner.pets WHERE owner.lastName = '" + lastName +"'";
+	    
+		// Fix injection with parameterization 1/2
+		String sqlQuery = "SELECT DISTINCT owner FROM Owner owner left join fetch owner.pets WHERE owner.lastName = :lName";
+			
+		TypedQuery<Owner> query = this.entityManager.createQuery(sqlQuery, Owner.class);
+		// Fix injection with parameterization 2/2
+		query.setParameter("lName", lastName);
+	    	
+		return query.getResultList();
+	}
 }
